@@ -1,15 +1,16 @@
 {
-  "author": "plant",
-  "name": "Table of Contents",
-  "description": "The RemNote plugin that will create a table of contents from a note.",
+  "author": "Personal fork (upstream: plant)",
+  "name": "Personal Contents",
+  "description": "Personal contents panel with H5/H6 filtering, nested-heading discovery and colour accents.",
+  "unlisted": true,
   "enableOnMobile": true,
-  "id": "plant-znddugq",
+  "id": "personal-toc-h6-filter",
   "manifestVersion": 1,
-  "repoUrl": "https://github.com/toxoxi/remnote-table-of-contents",
+  "repoUrl": "https://github.com/nprps/remnote-personal-contents",
   "version": {
-    "major": 1,
-    "minor": 0,
-    "patch": 3
+    "major": 0,
+    "minor": 1,
+    "patch": 2
   },
   "requestNative": false,
   "requiredScopes": [

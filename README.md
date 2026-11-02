@@ -1,50 +1,31 @@
-# Table of Contents Plugin
+# Personal Contents for RemNote
 
-This RemNote plugin creates a table of contents from your note automatically.
+A personal, sandboxed fork of [Table of Contents by plant / toxoxi](https://github.com/toxoxi/remnote-table-of-contents), based on upstream commit `72def364c51c9c389d8cbbed48dccec74471e64e`. The upstream MIT licence is retained in LICENSE.
 
-This idea comes from the below plugin request.<br/>
-https://feedback.remnote.com/p/ability-to-create-a-table-of-contents
+## Behaviour
 
-## Features
+- Shows a contents list in RemNote's desktop right sidebar (mobile layout is configured but not yet tested).
+- Excludes H5 and H6 by default; their visible heading descendants remain discoverable.
+- Finds headings beneath ordinary notes, preserving document order. Ordinary notes and filtered headings do not add outline indentation.
+- Supports heading nesting beyond the original four-level cutoff, with cycle guards.
+- Renders nothing when the document has no included headings.
+- Uses equal 18px Lexend text, weight 405, grey text and short heading accents: H1 red, H2 purple, H3 blue, H4 green.
+- Clicking a heading reveals only its collapsed ancestors, outside-in and non-recursively, then navigates to it inside the document.
 
-- Show the table of contents in the right sidebar.
-- You can jump to the content by clicking it.
+## Permissions and privacy
 
-![working_sample](https://github.com/toxoxi/remnote-table-of-contents/assets/29012724/6c1d67da-c6c3-4fff-832d-56f9eb92c31e)
+Native mode is not requested. All / ReadCreateModify is required because RemNote treats unfolding a parent as a modification. The plugin code uses this permission to expand collapsed ancestors; it does not create, edit or delete note content. No delete scope is requested.
 
-## How to use it?
+Notes are read through RemNote's SDK and rendered locally in the plugin iframe. No note content is sent to an external API. The Lexend font stylesheet is requested from Google Fonts.
 
-- What will be displayed?
-  - headings are automatically displayed in the right sidebar
-    - the inner contents are ignored
-  - but if the inner contents are also headings, they will be displayed
-- How to jump?
-  - click the link in the table of contents
-  - if the content jumping to is inside the collapsed rem, it will be automatically expanded
+## Development and validation
 
-## More details
+Install dependencies using `npm ci`. Run `npx tsc --noEmit` and `node --test test/heading-filter.cjs`. Start the local server with `npm run dev`; the development configuration listens only on 127.0.0.1:8782 with browser launch and development websockets disabled. Use RemNote's Develop from localhost option.
 
-See the below image or under texts (for reading)
-![image](https://github.com/toxoxi/remnote-table-of-contents/assets/29012724/a7ceb146-f6ea-4925-ae75-b1e9c5dc9f87)
+For a production build, set NODE_ENV to production and run webpack with webpack.config.js. Package the contents of dist at the root of a ZIP and upload through RemNote's Plugins > Build screen. The manifest sets unlisted=true; RemNote approval is still required for distribution.
 
-- heading "size" does not affect how it will be displayed
-  - [h1] This is ok
-  - [h3] This is also ok
-- the maximum depth to be able to display is four
-  - depth ⇒ the count of nesting from the top
-    - DEPTH: 4 – this heading will be displayed
-      - DEPTH: 5 – THIS HEADING WON'T BE DISPLAYED
-- indirect headings are not displayed
-  - The table of contents only displays headings directly underneath the parent heading.
-    - this heading is not displayed because it is not directly underneath the heading content
+## Verification and remaining limits
 
-<!-- ignore-after -->
+The filter, traversal and ancestor-path logic have SDK-shaped mock regression tests. The built-in RemNote browser was used to verify real H5/H6 filtering, headings beneath an ordinary parent, nested H3/H4, a collapsed-parent navigation case, and a truly blank empty state. These checks are not a guarantee of every Desktop, mobile or portal configuration.
 
-## Release
-
-1. develop locally with `yarn dev`
-   - take care of using macOS app rather than web
-2. update manifest version
-3. run `yarn build`
-4. upload the PluginZip.zip to market
-5. wait for approval
+The upstream whole-document reactive subscription remains broad. Large-document performance has not been benchmarked. Portal-specific discovery and navigation need dedicated validation. Loading currently shares the requested blank presentation with an empty outline. The host may display an undefined widget tab label with the pinned SDK despite the configured title.

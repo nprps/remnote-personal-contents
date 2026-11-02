@@ -13,7 +13,9 @@ const CopyPlugin = require('copy-webpack-plugin');
 const isProd = process.env.NODE_ENV === 'production';
 const isDevelopment = !isProd;
 
-const fastRefresh = isDevelopment ? new ReactRefreshWebpackPlugin() : null;
+// Sandboxed frames have an opaque origin. Avoid a development websocket/client
+// entirely; explicit browser reloads test the same startup path as a release.
+const fastRefresh = null;
 
 const SANDBOX_SUFFIX = '-sandbox';
 
@@ -67,6 +69,11 @@ const config = {
       const widgetName = queryParams["widgetName"];
       if (widgetName == undefined) {document.body.innerHTML+="Widget ID not specified."}
 
+      ${isProd ? `const css = document.createElement('link');
+      css.rel = 'stylesheet';
+      css.href = widgetName+"${SANDBOX_SUFFIX}.css";
+      document.head.appendChild(css);` : ''}
+
       const s = document.createElement('script');
       s.type = "module";
       s.src = widgetName+"${SANDBOX_SUFFIX}.js";
@@ -89,6 +96,7 @@ const config = {
     new CopyPlugin({
       patterns: [
         {from: 'public', to: ''},
+        {from: 'LICENSE', to: ''},
         {from: 'README.md', to: ''}
       ]
     }),
@@ -104,9 +112,13 @@ if (isProd) {
 } else {
   // for more information, see https://webpack.js.org/configuration/dev-server
   config.devServer = {
-    port: 8080,
-    open: true,
-    hot: true,
+    host: '127.0.0.1',
+    allowedHosts: ['127.0.0.1', 'localhost', 'www.remnote.com', 'remnote.com'],
+    port: 8782,
+    open: false,
+    hot: false,
+    client: false,
+    webSocketServer: false,
     compress: true,
     watchFiles: ['src/*'],
     headers: {

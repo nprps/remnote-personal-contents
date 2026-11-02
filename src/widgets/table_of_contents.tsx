@@ -1,4 +1,6 @@
 import { renderWidget, usePlugin, useTracker, RemId } from '@remnote/plugin-sdk';
+import '../style.css';
+import '../App.css';
 import {
   convertContentsToFlatList,
   expandHighestCollapsedAncestor,
@@ -18,27 +20,21 @@ export const TableOfContentsWidget = () => {
         const rem = await reactivePlugin.rem.findOne(remId);
         if (!rem) return [];
         await rem.allRemInDocumentOrPortal(); // track the changes of all rems
-        return await generateContents(rem, plugin);
+        const excludeH6 = await reactivePlugin.settings.getSetting<boolean>('exclude-h6');
+        return await generateContents(rem, reactivePlugin, excludeH6 !== false);
       },
       [lastOpenedRemId]
     ) || [];
 
-  // TODO: add a spinner to distinguish between no contents and loading
   if (contents.length === 0) {
-    return (
-      <nav className="rounded py-1 px-4">
-        <h1 className="text-lg">No headings in this page</h1>
-        <p>Use headings to create a table of contents and organize your knowledge!</p>
-      </nav>
-    );
+    return null;
   }
 
   const flatContents = convertContentsToFlatList(contents);
 
   const jumpToRem = async (remId: RemId) => {
-    // expand the highest collapsed ancestor rem in order to jump to the rem
+    // Reveal only the ancestor path; do not recursively expand unrelated branches.
     await expandHighestCollapsedAncestor(remId, plugin);
-    // jump to the rem
     const rem = await plugin.rem.findOne(remId);
     const parentRemId = await plugin.window.getOpenPaneRemId(
       await plugin.window.getFocusedPaneId()
@@ -47,17 +43,20 @@ export const TableOfContentsWidget = () => {
   };
 
   return (
-    <nav className="rounded py-1 px-4 h-full overflow-y-auto">
-      <h1 className="text-lg">Contents</h1>
-      <hr className="border-gray-300" />
-      <ul className="p-0 space-y-3 list-none">
+    <nav className="toc-panel">
+      <h1 className="toc-title">Contents</h1>
+      <hr className="toc-divider" />
+      <ul className="toc-list">
         {flatContents.map((content, i) => (
-          <li key={`${content.id}_${i}`} className={`ml-${(content.depth - 1) * 4}`}>
+          <li key={`${content.id}_${i}`} className={`toc-level-${content.level ?? 'unknown'}`} style={{ marginLeft: (content.depth - 1) * 16 }}>
             <a
               key={`${content.id}_${i}`}
               href="#"
-              onClick={async () => await jumpToRem(content.id)}
-              className="flex text-base no-underline text-gray-700 hover:text-gray-900 hover:underline"
+              onClick={async (event) => {
+                event.preventDefault();
+                await jumpToRem(content.id);
+              }}
+              className="toc-link"
             >
               {content.text}
             </a>

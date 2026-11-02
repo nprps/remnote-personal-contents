@@ -10,6 +10,12 @@ import '../App.css';
 import { isMobileOs } from '../lib/utils';
 
 async function onActivate(plugin: ReactRNPlugin) {
+  await plugin.settings.registerBooleanSetting({
+    id: 'exclude-h6',
+    title: 'Exclude H5 and H6 from contents',
+    description: 'Reserve H5 and H6 for small notes. Other headings directly beneath them remain visible.',
+    defaultValue: true,
+  });
   // Register a sidebar widget.
   const os = await plugin.app.getOperatingSystem();
 
@@ -18,7 +24,7 @@ async function onActivate(plugin: ReactRNPlugin) {
   await plugin.app.registerWidget('table_of_contents', location, {
     dimensions: { height: 'auto', width: '100%' },
     widgetTabIcon: `${plugin.rootURL}toc_icon.png`,
-    widgetTabTitle: 'Table of Contents',
+    widgetTabTitle: 'Personal Contents',
   });
 
   plugin.event.addListener(AppEvents.GlobalOpenRem, undefined, async (message) => {

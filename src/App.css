@@ -1,1 +1,31 @@
-/* Add your plugin styles here. */
+body { font-family: 'Lexend', 'Segoe UI', sans-serif; font-optical-sizing: auto; }
+.toc-panel, .toc-title, .toc-link { font-family: 'Lexend', 'Segoe UI', sans-serif !important; }
+.toc-panel {
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 100%;
+  overflow-y: auto;
+  padding: 24px 20px 32px;
+}
+.toc-title { margin: 0; font-size: 20px; font-weight: 600; line-height: 1.5; }
+.toc-divider { margin: 14px 0 18px; border: 0; border-top: 1px solid #d1d5db; }
+.toc-list { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.toc-panel .toc-link { position: relative; display: block; padding-bottom: 8px; font-size: 18px; line-height: 1.5; font-weight: 405; color: #374151 !important; text-decoration: none !important; overflow-wrap: anywhere; }
+.toc-panel .toc-link:hover { color: #374151 !important; text-decoration: none !important; }
+/* Same short, rounded accent as the editor; actual heading level selects colour. */
+.toc-level-1 { --toc-accent-source: #ffe5e9; }
+.toc-level-2 { --toc-accent-source: #f6ebff; }
+.toc-level-3 { --toc-accent-source: #d4f0ff; }
+.toc-level-4 { --toc-accent-source: #add69d; }
+.toc-panel :is(.toc-level-1, .toc-level-2, .toc-level-3, .toc-level-4) > .toc-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: min(100px, 100%);
+  height: 3.5px;
+  border-radius: 999px;
+  background: oklch(from var(--toc-accent-source) clamp(0, calc(l - 0.08), 1) calc(c * 3) h);
+  pointer-events: none;
+}
+.toc-link:focus-visible { outline: 2px solid #7c83df; outline-offset: 3px; border-radius: 3px; }

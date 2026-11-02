@@ -5,3 +5,8 @@ dist-ssr
 *.local
 *.zip
 .idea
+/work/
+/BUILD-STATUS.md
+/PERSONAL-FORK.md
+/Contents-*.png
+/Install-ready.jpg
